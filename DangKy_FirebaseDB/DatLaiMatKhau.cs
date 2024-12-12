@@ -1,36 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FireSharp.Config;
-using FireSharp.Interfaces;
-using FireSharp.Response;
-using FireSharp;
+using Newtonsoft.Json;
 
 namespace DangKy_FirebaseDB
 {
     public partial class DatLaiMatKhau : Form
     {
-        private IFirebaseClient Client;
-        private string userName;
+        private readonly HttpClient _httpClient;
+        private readonly string _username;
 
         public DatLaiMatKhau(string email, string username)
         {
             InitializeComponent();
-            Client = new FirebaseClient(ifc);
-            userName = username;
+            _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7029/api/") };
+            _username = username;
         }
-
-        IFirebaseConfig ifc = new FirebaseConfig
-        {
-            AuthSecret = "ptadAFZjKIegVxEFzWhRrhn5VUj0qbWM0upbVKEa",
-            BasePath = "https://bombmaster-14f3a-default-rtdb.asia-southeast1.firebasedatabase.app"
-        };
 
         private async void bt_changepw_Click(object sender, EventArgs e)
         {
@@ -49,32 +36,43 @@ namespace DangKy_FirebaseDB
                 return;
             }
 
-            await UpdatePasswordInFirebase(userName, newPassword);
-            MessageBox.Show("Mật khẩu đã được cập nhật thành công.", "Thông báo", MessageBoxButtons.OK);
-            DangNhap dangNhap = new DangNhap();
-            dangNhap.Show();
-            this.Hide();
+            var result = await UpdatePasswordInFirebase(_username, newPassword);
+            if (result.Success)
+            {
+                MessageBox.Show("Mật khẩu đã được cập nhật thành công.", "Thông báo", MessageBoxButtons.OK);
+                DangNhap dangNhap = new DangNhap();
+                dangNhap.Show();
+                this.Hide();
+            }
+            else
+            {
+                MessageBox.Show("Không thể cập nhật mật khẩu.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private async Task UpdatePasswordInFirebase(string username, string newPassword)
+        private async Task<RegisterResult> UpdatePasswordInFirebase(string username, string newPassword)
         {
-            var path = $"Users/{username}/Password";
-            await Client.SetAsync(path, newPassword);
+            var request = new UpdatePasswordRequest { Username = username, NewPassword = newPassword };
+            var json = JsonConvert.SerializeObject(request);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("Account/update-password", content);
+            var responseString = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<RegisterResult>(responseString);
         }
 
         private void bt_showpw_Click(object sender, EventArgs e)
         {
-            if(tb_password.PasswordChar == '*')
+            if (tb_password.PasswordChar == '*')
             {
                 tb_password.PasswordChar = '\0';
                 bt_hidepw.BringToFront();
             }
-
         }
 
         private void bt_hidepw_Click(object sender, EventArgs e)
         {
-            if(tb_password.PasswordChar == '\0')
+            if (tb_password.PasswordChar == '\0')
             {
                 tb_password.PasswordChar = '*';
                 bt_showpw.BringToFront();
@@ -83,7 +81,7 @@ namespace DangKy_FirebaseDB
 
         private void bt_showConfirmpw_Click(object sender, EventArgs e)
         {
-            if(tb_confirmpw.PasswordChar == '*')
+            if (tb_confirmpw.PasswordChar == '*')
             {
                 tb_confirmpw.PasswordChar = '\0';
                 bt_hideConfirmpw.BringToFront();
@@ -92,11 +90,24 @@ namespace DangKy_FirebaseDB
 
         private void bt_hideConfirmpw_Click(object sender, EventArgs e)
         {
-            if(tb_confirmpw.PasswordChar == '\0')
+            if (tb_confirmpw.PasswordChar == '\0')
             {
                 tb_confirmpw.PasswordChar = '*';
                 bt_showConfirmpw.BringToFront();
             }
         }
     }
+
+    public class RegisterResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+    }
+
+    public class UpdatePasswordRequest
+    {
+        public string Username { get; set; }
+        public string NewPassword { get; set; }
+    }
 }
+

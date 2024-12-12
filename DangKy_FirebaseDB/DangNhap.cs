@@ -1,62 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FireSharp.Config;
-using FireSharp.Interfaces;
-using FireSharp.Response;
-using SuperTank.General;
+using Newtonsoft.Json;
 
 namespace DangKy_FirebaseDB
 {
     public partial class DangNhap : Form
     {
+        private static readonly HttpClient client = new HttpClient();
+
         public DangNhap()
         {
             InitializeComponent();
         }
-        IFirebaseConfig ifc = new FirebaseConfig
-        {
-            AuthSecret = "ptadAFZjKIegVxEFzWhRrhn5VUj0qbWM0upbVKEa",
-            BasePath = "https://bombmaster-14f3a-default-rtdb.asia-southeast1.firebasedatabase.app"
-        };
-        IFirebaseClient Client;
-        private void bt_login_Click(object sender, EventArgs e)
+
+        private async void bt_login_Click(object sender, EventArgs e)
         {
             string tentk = tb_username.Text;
             string matkhau = tb_password.Text;
-            if (tentk == "" || matkhau == "")
+            if (string.IsNullOrEmpty(tentk) || string.IsNullOrEmpty(matkhau))
             {
                 MessageBox.Show("Vui lòng nhập đầy đủ thông tin", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            var loginData = new { Username = tentk, Password = matkhau };
+            var content = new StringContent(JsonConvert.SerializeObject(loginData), Encoding.UTF8, "application/json");
+
             try
             {
-                Client = new FireSharp.FirebaseClient(ifc);
-            }
-            catch
-            {
-                MessageBox.Show("Không thể kết nối đến server", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            // Truy vấn trực tiếp đến tài khoản cụ thể
-            FirebaseResponse res = Client.Get("Users/" + tentk);
-            Register acc = res.ResultAs<Register>();
+                var response = await client.PostAsync("https://localhost:7029/api/account/login", content);
+                response.EnsureSuccessStatusCode();
 
-            if (res.Body == "null" || acc == null)
-            {
-                MessageBox.Show("Tài khoản không tồn tại", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else
-            {
-                if (acc.Password == matkhau)
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var loginResult = JsonConvert.DeserializeObject<LoginResult>(responseBody);
+
+                if (loginResult.Success)
                 {
-                    //MessageBox.Show("Đăng nhập thành công");
+                    MessageBox.Show("Đăng nhập thành công", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     // Chuyển sang form khác
                     SuperTank.WindowsForms.frmMenu frm = new SuperTank.WindowsForms.frmMenu();
                     frm.Show();
@@ -64,10 +47,17 @@ namespace DangKy_FirebaseDB
                 }
                 else
                 {
-                    MessageBox.Show("Sai mật khẩu", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(loginResult.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show("Không thể kết nối đến server: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (JsonReaderException ex)
+            {
+                MessageBox.Show("Lỗi phân tích cú pháp JSON: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void llb_registry_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -80,17 +70,15 @@ namespace DangKy_FirebaseDB
         {
             QuenMatKhau qmk = new QuenMatKhau();
             qmk.Show();
-            //this.Hide();
         }
 
         private void bt_hide_Click(object sender, EventArgs e)
         {
-            if(tb_password.PasswordChar == '\0')
+            if (tb_password.PasswordChar == '\0')
             {
                 tb_password.PasswordChar = '*';
                 bt_show.BringToFront();
             }
-            
         }
 
         private void bt_show_Click(object sender, EventArgs e)
@@ -106,5 +94,11 @@ namespace DangKy_FirebaseDB
         {
 
         }
+    }
+
+    public class LoginResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
     }
 }
