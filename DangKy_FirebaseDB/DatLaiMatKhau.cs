@@ -12,7 +12,7 @@ namespace DangKy_FirebaseDB
         private readonly HttpClient _httpClient;
         private readonly string _username;
 
-        public DatLaiMatKhau(string email, string username)
+        public DatLaiMatKhau(string username)
         {
             InitializeComponent();
             _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7029/api/") };
@@ -46,7 +46,7 @@ namespace DangKy_FirebaseDB
             }
             else
             {
-                MessageBox.Show("Không thể cập nhật mật khẩu.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Không thể cập nhật mật khẩu: {result.Message}", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -56,9 +56,16 @@ namespace DangKy_FirebaseDB
             var json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("Account/update-password", content);
-            var responseString = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<RegisterResult>(responseString);
+            try
+            {
+                var response = await _httpClient.PostAsync("account/update-password", content);
+                var responseString = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<RegisterResult>(responseString);
+            }
+            catch (HttpRequestException ex)
+            {
+                return new RegisterResult { Success = false, Message = $"Lỗi kết nối: {ex.Message}" };
+            }
         }
 
         private void bt_showpw_Click(object sender, EventArgs e)
@@ -110,4 +117,5 @@ namespace DangKy_FirebaseDB
         public string NewPassword { get; set; }
     }
 }
+
 

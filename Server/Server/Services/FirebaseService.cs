@@ -69,41 +69,74 @@ namespace Server.Services
             }
         }
 
-        public async Task<bool> ResetPassword(string email)
+        public async Task<UpdatePasswordResult> UpdatePasswordInFirebase(string username, string newPassword)
         {
-            var emailResponse = await _client.GetAsync("Users");
-            var users = emailResponse.ResultAs<Dictionary<string, Register>>();
-            if (users == null || !users.Values.Any(u => u.Email == email))
+            // Check if user exists
+            var response = await _client.GetAsync("Users/" + username);
+            if (response.Body == "null")
             {
-                return false; // Email không được đăng ký
+                return new UpdatePasswordResult { Success = false, Message = "Tài khoản không tồn tại." };
             }
 
-            // Thực hiện logic đặt lại mật khẩu ở đây (ví dụ: gửi liên kết đặt lại mật khẩu đến email)
-            return true;
-        }
-
-        public async Task<RegisterResult> UpdatePasswordInFirebase(string username, string newPassword)
-        {
+            // Update the password
             var path = $"Users/{username}/Password";
             var setResponse = await _client.SetAsync(path, newPassword);
             if (setResponse.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                return new RegisterResult { Success = true, Message = "Mật khẩu đã được cập nhật thành công." };
+                return new UpdatePasswordResult { Success = true, Message = "Mật khẩu đã được cập nhật thành công." };
             }
             else
             {
-                return new RegisterResult { Success = false, Message = "Không thể cập nhật mật khẩu." };
+                return new UpdatePasswordResult { Success = false, Message = "Không thể cập nhật mật khẩu." };
             }
         }
+
+        public async Task<bool> IsEmailExists(string email)
+        {
+            var emailResponse = await _client.GetAsync("Users");
+            var users = emailResponse.ResultAs<Dictionary<string, Register>>();
+            return users != null && users.Values.Any(u => u.Email == email);
+        }
+
+        public async Task SaveVerificationCodeToFirebase(string email, string verificationCode)
+        {
+            var path = $"VerificationCodes/{email.Replace(".", ",")}";
+            await _client.SetAsync(path, verificationCode);
+        }
+
+        public async Task<VerificationCodeResult> GetVerificationCodeFromFirebase(string email)
+        {
+            // Retrieve all users
+            var emailResponse = await _client.GetAsync("Users");
+            var users = emailResponse.ResultAs<Dictionary<string, Register>>();
+
+            if (users == null || users.Count == 0)
+            {
+                return new VerificationCodeResult { Success = false, Message = "Không thể truy cập dữ liệu người dùng." };
+            }
+
+            // Find the user with the matching email
+            var userEntry = users.FirstOrDefault(u => u.Value.Email == email);
+
+            if (string.IsNullOrEmpty(userEntry.Key))
+            {
+                return new VerificationCodeResult { Success = false, Message = "Email không tồn tại." };
+            }
+
+            var username = userEntry.Key;
+
+            // Get the verification code
+            var path = $"VerificationCodes/{email.Replace(".", ",")}";
+            var response = await _client.GetAsync(path);
+            var verificationCode = response.ResultAs<string>();
+
+            if (string.IsNullOrEmpty(verificationCode))
+            {
+                return new VerificationCodeResult { Success = false, Message = "Không tìm thấy mã xác nhận.", Username = username };
+            }
+
+            return new VerificationCodeResult { Success = true, VerificationCode = verificationCode, Username = username };
+        }
     }
-    public class RegisterResult
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-    }
-    public class LoginResult
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-    }
+
 }
