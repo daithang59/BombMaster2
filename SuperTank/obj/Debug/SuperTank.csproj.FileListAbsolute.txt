@@ -76,3 +76,15 @@ C:\Users\THANG\source\repos\NENNENEN\SuperTank\obj\Debug\SuperTank.csproj.Genera
 C:\Users\THANG\source\repos\NENNENEN\SuperTank\obj\Debug\SuperTank.csproj.CoreCompileInputs.cache
 C:\Users\THANG\source\repos\NENNENEN\SuperTank\obj\Debug\SuperTank.exe
 C:\Users\THANG\source\repos\NENNENEN\SuperTank\obj\Debug\SuperTank.pdb
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\bin\Debug\SuperTank.exe.config
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\bin\Debug\SuperTank.exe
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\bin\Debug\SuperTank.pdb
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.csproj.AssemblyReference.cache
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.frmGame.resources
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.Properties.Resources.resources
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.WindowsForms.frmMenu.resources
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.csproj.GenerateResource.cache
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.csproj.CoreCompileInputs.cache
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.exe
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.pdb
+C:\Users\Pexa\source\repos\BombMaster2\SuperTank\obj\Debug\SuperTank.Multi_Mode.resources

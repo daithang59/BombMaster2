@@ -186,8 +186,10 @@ namespace SuperTank.WindowsForms
 
         private void btn_PlayerMulti_Click(object sender, EventArgs e)
         {
-            SanhCho sc = new SanhCho();
-            sc.Show();
+            Multi_Mode multi_Mode = new Multi_Mode();
+            multi_Mode.Show();
+            /*SanhCho sc = new SanhCho();
+            sc.Show();*/
             this.Hide();
         }
 

@@ -49,6 +49,12 @@
   <ItemGroup>
     <Compile Include="General\Sound.cs" />
     <Compile Include="General\PlayerInfor.cs" />
+    <Compile Include="Multi_Mode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Multi_Mode.Designer.cs">
+      <DependentUpon>Multi_Mode.cs</DependentUpon>
+    </Compile>
     <Compile Include="Objects\EnemyTank.cs" />
     <Compile Include="General\Common.cs" />
     <Compile Include="General\Enum.cs" />
@@ -83,6 +89,9 @@
     <Compile Include="WindowsForms\SanhCho.Designer.cs">
       <DependentUpon>SanhCho.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Multi_Mode.resx">
+      <DependentUpon>Multi_Mode.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="WindowsForms\frmGame.resx">
       <DependentUpon>frmGame.cs</DependentUpon>
     </EmbeddedResource>

@@ -64,8 +64,11 @@ namespace SuperTank
             picNumberEnemyTanks = new PictureBox[]{picTank00, picTank01, picTank02,
             picTank03, picTank04, picTank05, picTank06, picTank07, picTank08, picTank09, picTank10,
             picTank11, picTank12, picTank13, picTank14, picTank15, picTank16, picTank17, picTank18, picTank19};
+
             // khởi tạo graphics
             graphics = pnMainGame.CreateGraphics();
+
+
             // khỏi tạo background
             background = new Bitmap(Common.SCREEN_WIDTH, Common.SCREEN_HEIGHT);
             // khởi tạo bitmap castle
@@ -960,6 +963,11 @@ namespace SuperTank
         {
             // lưu thông tin level người chơi lại
             PlayerInfor.WritePlayerLevel(@"\PlayerLevel.txt");
+        }
+
+        private void pnRedBackground_Paint(object sender, PaintEventArgs e)
+        {
+
         }
 
         // thoát game
