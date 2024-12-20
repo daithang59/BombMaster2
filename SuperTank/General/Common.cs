@@ -32,11 +32,10 @@ namespace SuperTank.General
         // vẽ lên bitmap
         public static void PaintObject(Bitmap bmpBack, Bitmap front, int x, int y, int xFrame, int yFrame, int wFrame, int hFrame)
         {
+            
             Graphics g = Graphics.FromImage(bmpBack);
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.DrawImage(front, x, y, new Rectangle(xFrame, yFrame, wFrame, hFrame), GraphicsUnit.Pixel);
-            //g.DrawRectangle(new Pen(Color.Yellow, 2)
-            //    , x, y, wFrame, hFrame);
             g.Dispose();
         }
 
