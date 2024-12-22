@@ -34,6 +34,7 @@ namespace SuperTank.WindowsForms
             this.btnAboutUs = new System.Windows.Forms.Button();
             this.btnPlaySingle = new System.Windows.Forms.Button();
             this.pnMenu = new System.Windows.Forms.Panel();
+            this.btn_PlayerMulti = new System.Windows.Forms.Button();
             this.pictureBox6 = new System.Windows.Forms.PictureBox();
             this.btnInstructions = new System.Windows.Forms.Button();
             this.pnTitle = new System.Windows.Forms.Panel();
@@ -62,7 +63,6 @@ namespace SuperTank.WindowsForms
             this.lblInstructions = new System.Windows.Forms.Label();
             this.pictureBox8 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.btn_PlayerMulti = new System.Windows.Forms.Button();
             this.pnMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
             this.pnTitle.SuspendLayout();
@@ -148,6 +148,25 @@ namespace SuperTank.WindowsForms
             this.pnMenu.Name = "pnMenu";
             this.pnMenu.Size = new System.Drawing.Size(500, 600);
             this.pnMenu.TabIndex = 13;
+            // 
+            // btn_PlayerMulti
+            // 
+            this.btn_PlayerMulti.BackColor = System.Drawing.Color.Transparent;
+            this.btn_PlayerMulti.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btn_PlayerMulti.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btn_PlayerMulti.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.btn_PlayerMulti.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btn_PlayerMulti.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_PlayerMulti.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_PlayerMulti.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btn_PlayerMulti.Location = new System.Drawing.Point(255, 140);
+            this.btn_PlayerMulti.Name = "btn_PlayerMulti";
+            this.btn_PlayerMulti.Size = new System.Drawing.Size(91, 79);
+            this.btn_PlayerMulti.TabIndex = 27;
+            this.btn_PlayerMulti.TabStop = false;
+            this.btn_PlayerMulti.Text = "MULTIPLAYER";
+            this.btn_PlayerMulti.UseVisualStyleBackColor = false;
+            this.btn_PlayerMulti.Click += new System.EventHandler(this.btn_PlayerMulti_Click);
             // 
             // pictureBox6
             // 
@@ -599,25 +618,6 @@ namespace SuperTank.WindowsForms
             this.button1.Text = "Menu";
             this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.btnMenu_Click);
-            // 
-            // btn_PlayerMulti
-            // 
-            this.btn_PlayerMulti.BackColor = System.Drawing.Color.Transparent;
-            this.btn_PlayerMulti.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btn_PlayerMulti.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.btn_PlayerMulti.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
-            this.btn_PlayerMulti.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.btn_PlayerMulti.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_PlayerMulti.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btn_PlayerMulti.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.btn_PlayerMulti.Location = new System.Drawing.Point(255, 140);
-            this.btn_PlayerMulti.Name = "btn_PlayerMulti";
-            this.btn_PlayerMulti.Size = new System.Drawing.Size(91, 79);
-            this.btn_PlayerMulti.TabIndex = 27;
-            this.btn_PlayerMulti.TabStop = false;
-            this.btn_PlayerMulti.Text = "MULTIPLAYER";
-            this.btn_PlayerMulti.UseVisualStyleBackColor = false;
-            this.btn_PlayerMulti.Click += new System.EventHandler(this.btn_PlayerMulti_Click);
             // 
             // frmMenu
             // 

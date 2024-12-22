@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using SuperTank.WindowsForms;
+
 
 namespace DangKy_FirebaseDB
 {
@@ -41,8 +43,11 @@ namespace DangKy_FirebaseDB
                 {
                     MessageBox.Show("Đăng nhập thành công", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     // Chuyển sang form khác
-                    SuperTank.WindowsForms.frmMenu frm = new SuperTank.WindowsForms.frmMenu();
-                    frm.Show();
+                    // Tạo và mở form frmMenu từ project SuperTank
+                    frmMenu menuForm = new frmMenu();
+                    menuForm.Show();
+
+                    // Ẩn form đăng nhập hiện tại
                     this.Hide();
                 }
                 else

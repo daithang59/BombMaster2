@@ -148,12 +148,6 @@
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </Compile>
     <Compile Include="Register.cs" />
-    <Compile Include="SanhCho.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SanhCho.Designer.cs">
-      <DependentUpon>SanhCho.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="DangKy.resx">
       <DependentUpon>DangKy.cs</DependentUpon>
     </EmbeddedResource>
@@ -175,9 +169,6 @@
     </Compile>
     <EmbeddedResource Include="QuenMatKhau.resx">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SanhCho.resx">
-      <DependentUpon>SanhCho.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

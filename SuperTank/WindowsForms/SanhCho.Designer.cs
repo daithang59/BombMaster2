@@ -379,7 +379,7 @@
             // lblHpTankPlayer
             // 
             this.lblHpTankPlayer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.lblHpTankPlayer.Location = new System.Drawing.Point(34, 72);
+            this.lblHpTankPlayer.Location = new System.Drawing.Point(34, 73);
             this.lblHpTankPlayer.Name = "lblHpTankPlayer";
             this.lblHpTankPlayer.Size = new System.Drawing.Size(101, 20);
             this.lblHpTankPlayer.TabIndex = 0;
@@ -394,7 +394,6 @@
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(102, 20);
             this.label6.TabIndex = 1;
-            this.label6.Click += new System.EventHandler(this.label6_Click);
             // 
             // label9
             // 

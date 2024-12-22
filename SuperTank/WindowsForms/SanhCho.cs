@@ -10,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace SuperTank.WindowsForms
 {
@@ -18,177 +17,287 @@ namespace SuperTank.WindowsForms
     {
         private Graphics graphics1;
         private Bitmap background1;
+        private Bitmap bufferImage; // Buffer để double buffering
         private int[,] map;
         private int level;
         private WallManagement wallManager;
-        private ExplosionManagement explosionManager;
         private List<PlayerTank> playerTanks;
         private Point[] spawnPoints;
         private frmMenu formMenu;
-        private Point titleClickPoint;
-        private int w, h;
-        private Bitmap tankSpritesheet;  // Chứa toàn bộ spritesheet
-        private Rectangle[] tankSourceRects; // Chứa vị trí cắt của từng loại tank
+        private Bitmap tankSpritesheet;
+        private Rectangle[] tankSourceRects;
+        private Timer gameTimer;
+        private Dictionary<PlayerTank, PlayerControls> playerControls;
+        // Thêm dictionary để theo dõi trạng thái phím cho mỗi người chơi
+        private Dictionary<Keys, bool> keyStates;
+         // Dictionary để lưu hướng hiện tại của mỗi xe tăng
+    private Dictionary<PlayerTank, Direction> currentDirections;
+
+
+        // Struct để lưu các phím điều khiển cho mỗi người chơi
+        private struct PlayerControls
+        {
+            public Keys Up, Down, Left, Right, Fire;
+            public PlayerControls(Keys up, Keys down, Keys left, Keys right, Keys fire)
+            {
+                Up = up;
+                Down = down;
+                Left = left;
+                Right = right;
+                Fire = fire;
+            }
+        }
 
         public SanhCho()
         {
-            this.level = 1;
             InitializeComponent();
             InitializeSpawnPoints();
             playerTanks = new List<PlayerTank>();
+            playerControls = new Dictionary<PlayerTank, PlayerControls>();
+            keyStates = new Dictionary<Keys, bool>();
+            currentDirections = new Dictionary<PlayerTank, Direction>();
 
-            // Load shared path
-            Common.path = Application.StartupPath + @"\Content";
-            // Load spritesheet
             tankSpritesheet = new Bitmap(Path.Combine(Common.path, "Images", "tank1.png"));
+            InitializeTankSourceRects();
 
-            // Khởi tạo source rectangles cho 4 loại tank khác nhau
-            tankSourceRects = new Rectangle[4];
-            int tankWidth = tankSpritesheet.Width / 8;  // Chiều rộng mỗi tank (8 cột)
-            int tankHeight = tankSpritesheet.Height / 8; // Chiều cao mỗi tank (8 hàng)
+            gameTimer = new Timer();
+            gameTimer.Interval = 16;
+            gameTimer.Tick += GameTimer_Tick;
 
-            // Chọn 4 màu tank khác nhau (ví dụ: xanh lá, đỏ, xanh dương, tím)
-            tankSourceRects[0] = new Rectangle(0, 0, tankWidth, tankHeight);          // Tank xanh lá
-            tankSourceRects[1] = new Rectangle(tankWidth, 0, tankWidth, tankHeight);  // Tank đỏ
-            tankSourceRects[2] = new Rectangle(tankWidth * 2, 0, tankWidth, tankHeight); // Tank xanh dương
-            tankSourceRects[3] = new Rectangle(tankWidth * 3, 0, tankWidth, tankHeight); // Tank tím
+            this.KeyPreview = true;
+            this.KeyDown += SanhCho_KeyDown;
+            this.KeyUp += SanhCho_KeyUp;
         }
+        private void InitializeTankSourceRects()
+        {
+            tankSourceRects = new Rectangle[4];
+            int tankWidth = tankSpritesheet.Width / 8;
+            int tankHeight = tankSpritesheet.Height / 8;
+
+            tankSourceRects[0] = new Rectangle(0, 0, tankWidth, tankHeight);
+            tankSourceRects[1] = new Rectangle(tankWidth, 0, tankWidth, tankHeight);
+            tankSourceRects[2] = new Rectangle(tankWidth * 2, 0, tankWidth, tankHeight);
+            tankSourceRects[3] = new Rectangle(tankWidth * 3, 0, tankWidth, tankHeight);
+        }
+
         private void InitializeSpawnPoints()
         {
-            // Define spawn points for different players
             spawnPoints = new Point[]
-              {
-                  new Point(Common.STEP * 2, Common.STEP * (Common.NUMBER_OBJECT_HEIGHT - 3)),  // Bottom left
-                  new Point(Common.STEP * (Common.NUMBER_OBJECT_WIDTH - 3), Common.STEP * (Common.NUMBER_OBJECT_HEIGHT - 3)),  // Bottom right
-                  new Point(Common.STEP * 2, Common.STEP * 2),  // Top left  
-                  new Point(Common.STEP * (Common.NUMBER_OBJECT_WIDTH - 3), Common.STEP * 2)   // Top right
-              };
+            {
+                new Point(Common.STEP * 2, Common.STEP * (Common.NUMBER_OBJECT_HEIGHT - 4)),
+                new Point(Common.STEP * (Common.NUMBER_OBJECT_WIDTH - 4), Common.STEP * (Common.NUMBER_OBJECT_HEIGHT - 4)),
+                new Point(Common.STEP * 2, Common.STEP * 2),
+                new Point(Common.STEP * (Common.NUMBER_OBJECT_WIDTH - 4), Common.STEP * 2)
+            };
         }
+
+        private void InitializePlayers()
+        {
+            // Tạo 2 người chơi
+            for (int i = 0; i < 2; i++)
+            {
+                PlayerTank tank = new PlayerTank();
+                tank.RectX = spawnPoints[i].X;
+                tank.RectY = spawnPoints[i].Y;
+                tank.LoadImage(Path.Combine(Common.path, "Images", "tank1.png"));
+                tank.IsActivate = true;
+                playerTanks.Add(tank);
+            }
+
+            // Khởi tạo controls cho player 1
+            var player1Controls = new PlayerControls(Keys.W, Keys.S, Keys.A, Keys.D, Keys.Space);
+            playerControls.Add(playerTanks[0], player1Controls);
+
+            // Thêm các phím vào keyStates cho player 1
+            keyStates[Keys.W] = false;
+            keyStates[Keys.S] = false;
+            keyStates[Keys.A] = false;
+            keyStates[Keys.D] = false;
+            keyStates[Keys.Space] = false;
+
+            // Khởi tạo controls cho player 2
+            var player2Controls = new PlayerControls(Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.Enter);
+            playerControls.Add(playerTanks[1], player2Controls);
+
+            // Thêm các phím vào keyStates cho player 2
+            keyStates[Keys.Up] = false;
+            keyStates[Keys.Down] = false;
+            keyStates[Keys.Left] = false;
+            keyStates[Keys.Right] = false;
+            keyStates[Keys.Enter] = false;
+        }
+
         private void SanhCho_Load(object sender, EventArgs e)
         {
             graphics1 = pnMulti.CreateGraphics();
-            background1 = new Bitmap(Common.SCREEN_WIDTH, Common.SCREEN_HEIGHT);
             pnMulti.Paint += PnMulti_Paint;
-            PlayerTank player = new PlayerTank();
-            
-            this.GameStart();
+
+            // Khởi tạo buffer với kích thước panel
+            bufferImage = new Bitmap(Common.SCREEN_WIDTH, Common.SCREEN_HEIGHT);
+
+            InitializePlayers();
+            GameStart();
+            gameTimer.Start();
         }
 
         private void GameStart()
         {
-            string FilePath = Common.path + @"\Maps\Map04.txt";
+            string FilePath = Common.path + @"\Maps\Map01.txt";
             map = Common.ReadMap(FilePath, Common.NUMBER_OBJECT_HEIGHT, Common.NUMBER_OBJECT_WIDTH);
             wallManager = new WallManagement();
             wallManager.CreatWall(this.map, this.level);
 
-            // Tính toán kích thước map
             int mapWidth = Common.NUMBER_OBJECT_WIDTH * Common.STEP;
             int mapHeight = Common.NUMBER_OBJECT_HEIGHT * Common.STEP;
             pnMulti.Size = new Size(mapWidth, mapHeight);
 
-            // Tạo background mới
+            // Vẽ background một lần duy nhất
             background1 = new Bitmap(mapWidth, mapHeight);
-
-            // Xóa và tạo lại danh sách tank
-            playerTanks.Clear();
-            AddPlayer();
-
             using (Graphics g = Graphics.FromImage(background1))
             {
-                // Xóa nền
                 g.Clear(Color.Black);
-
-                // Vẽ tường trước
                 wallManager.ShowAllWall(background1);
+            }
+        }
 
-                // Vẽ các tank
-                foreach (var tank in playerTanks)
+        private void GameTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateGame();
+            RenderGame();
+        }
+        private void UpdateGame()
+        {
+            // Cập nhật trạng thái di chuyển cho từng tank dựa trên keyStates
+            foreach (var pair in playerControls)
+            {
+                var tank = pair.Key;
+                var controls = pair.Value;
+
+                // Reset trạng thái di chuyển
+                tank.Up = tank.Down = tank.Left = tank.Right = false;
+                tank.IsMove = false;
+
+                // Kiểm tra trạng thái các phím và cập nhật tank
+                if (keyStates[controls.Up])
                 {
-                    if (tank != null && tank.BmpObject != null)
+                    tank.Up = true;
+                    tank.IsMove = true;
+                }
+                else if (keyStates[controls.Down])
+                {
+                    tank.Down = true;
+                    tank.IsMove = true;
+                }
+                else if (keyStates[controls.Left])
+                {
+                    tank.Left = true;
+                    tank.IsMove = true;
+                }
+                else if (keyStates[controls.Right])
+                {
+                    tank.Right = true;
+                    tank.IsMove = true;
+                }
+
+                // Cập nhật frame nếu đang di chuyển
+                if (tank.IsMove)
+                {
+                    tank.RotateFrame();
+                }
+
+                // Xử lý di chuyển và va chạm
+                if (tank.IsMove)
+                {
+                    int oldX = tank.RectX;
+                    int oldY = tank.RectY;
+
+                    tank.Move();
+
+                    if (tank.IsWallCollision(wallManager.Walls, tank.DirectionTank))
                     {
-                        tank.Show(background1);
+                        tank.RectX = oldX;
+                        tank.RectY = oldY;
                     }
                 }
             }
+        }
 
-            // Yêu cầu vẽ lại
+        private void RenderGame()
+        {
+            // Vẽ lên buffer thay vì vẽ trực tiếp
+            using (Graphics g = Graphics.FromImage(bufferImage))
+            {
+                // Vẽ background
+                g.DrawImage(background1, 0, 0);
+
+                // Vẽ các tank và đạn
+                foreach (var tank in playerTanks)
+                {
+                    tank.Show(bufferImage);
+                    tank.ShowBulletAndMove(bufferImage);
+                }
+            }
+
+            // Yêu cầu vẽ lại panel
             pnMulti.Invalidate();
         }
-        private void PnMulti_Paint(object sender, PaintEventArgs e)
-        {
-            if (background1 != null && tankSpritesheet != null)
-            {
-                e.Graphics.DrawImage(background1, 0, 0);
 
-                // Vẽ tank tại các điểm spawn
-                for (int i = 0; i < spawnPoints.Length; i++)
+        private void SanhCho_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Cập nhật trạng thái phím trong keyStates
+            if (keyStates.ContainsKey(e.KeyCode))
+            {
+                keyStates[e.KeyCode] = true;
+            }
+
+            // Xử lý bắn đạn
+            foreach (var pair in playerControls)
+            {
+                var tank = pair.Key;
+                var controls = pair.Value;
+
+                if (e.KeyCode == controls.Fire)
                 {
-                    // Vẽ từng tank với source rectangle tương ứng
-                    e.Graphics.DrawImage(
-                        tankSpritesheet,                    // Spritesheet gốc
-                        new Rectangle(                      // Vị trí đích
-                            spawnPoints[i].X,
-                            spawnPoints[i].Y,
-                            32,                            // Chiều rộng tank khi hiển thị
-                            32                             // Chiều cao tank khi hiển thị
-                        ),
-                        tankSourceRects[i],                // Vùng cắt từ spritesheet
-                        GraphicsUnit.Pixel
-                    );
+                    tank.CreatBullet(@"\Images\bullet1.png", @"\Images\bullet2.png");
                 }
             }
         }
-        public void AddPlayer()
+
+        private void SanhCho_KeyUp(object sender, KeyEventArgs e)
         {
-            for (int i = 0; i < 4; i++)
+            // Cập nhật trạng thái phím trong keyStates
+            if (keyStates.ContainsKey(e.KeyCode))
             {
-                PlayerTank newPlayer = new PlayerTank();
-                newPlayer.PlayerNumber = i + 1;
-
-                // Set vị trí theo spawnPoints
-                int x = spawnPoints[i].X / Common.STEP;  // Chuyển đổi pixel sang ô lưới
-                int y = spawnPoints[i].Y / Common.STEP;
-                newPlayer.SetLocation(x, y);
-
-                AssignPlayerControls(newPlayer, i);
-                playerTanks.Add(newPlayer);
-
-                // Debug check
-                Console.WriteLine($"Added tank {i + 1} at position: {x}, {y}");
+                keyStates[e.KeyCode] = false;
+            }
+        }
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // Xử lý các phím mũi tên
+            if (keyStates.ContainsKey(keyData))
+            {
+                KeyEventArgs args = new KeyEventArgs(keyData);
+                SanhCho_KeyDown(this, args);
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+        private void PnMulti_Paint(object sender, PaintEventArgs e)
+        {
+            if (bufferImage != null)
+            {
+                e.Graphics.DrawImage(bufferImage, 0, 0);
+            }
+        }
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;  // Bật WS_EX_COMPOSITED
+                return cp;
             }
         }
 
-        private void AssignPlayerControls(PlayerTank player, int playerIndex)
-        {
-            switch (playerIndex)
-            {
-                case 0: // First player - Arrow keys
-                    player.SetControls(Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.Space);  
-                    break;
-                case 1: // Second player - WASD
-                    player.SetControls(Keys.W, Keys.S, Keys.A, Keys.D, Keys.Q);
-                    break;
-                case 2: // Third player - IJKL
-                    player.SetControls(Keys.I, Keys.K, Keys.J, Keys.L, Keys.U);
-                    break;
-                case 3: // Fourth player - Numpad
-                    player.SetControls(Keys.NumPad8, Keys.NumPad5, Keys.NumPad4, Keys.NumPad6, Keys.NumPad0);
-                    break;
-            }
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ReorganizePlayers()
-        {
-            for (int i = 0; i < playerTanks.Count; i++)
-            {
-                playerTanks[i].SetLocation(spawnPoints[i].X, spawnPoints[i].Y);
-                playerTanks[i].PlayerNumber = i + 1;
-            }
-        }
     }
 }
