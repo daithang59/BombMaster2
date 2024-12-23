@@ -995,7 +995,7 @@
             this.pnTitle.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnTitle.Location = new System.Drawing.Point(0, 0);
             this.pnTitle.Name = "pnTitle";
-            this.pnTitle.Size = new System.Drawing.Size(1012, 38);
+            this.pnTitle.Size = new System.Drawing.Size(1012, 35);
             this.pnTitle.TabIndex = 1;
             this.pnTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnTitle_MouseDown);
             this.pnTitle.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnTitle_MouseMove);
@@ -1044,8 +1044,7 @@
             // 
             // frmGame
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(115F, 115F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.ClientSize = new System.Drawing.Size(1012, 811);
             this.Controls.Add(this.pnTitle);
