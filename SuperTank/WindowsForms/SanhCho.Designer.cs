@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.pnInfor = new System.Windows.Forms.Panel();
             this.button3 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
@@ -61,6 +62,8 @@
             this.lblCastleBlood = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
             this.button4 = new System.Windows.Forms.Button();
+            this.GameLoop = new System.Windows.Forms.Timer(this.components);
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.pnInfor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picTank11)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picTank10)).BeginInit();
@@ -416,6 +419,7 @@
             this.pnMulti.Size = new System.Drawing.Size(884, 788);
             this.pnMulti.TabIndex = 6;
             this.pnMulti.TabStop = true;
+            this.pnMulti.Paint += new System.Windows.Forms.PaintEventHandler(this.pnMulti_Paint_1);
             // 
             // lblCastleBlood
             // 
@@ -444,10 +448,17 @@
             this.button4.Text = "Send";
             this.button4.UseVisualStyleBackColor = true;
             // 
+            // GameLoop
+            // 
+            this.GameLoop.Tick += new System.EventHandler(this.GameLoop_Tick);
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // SanhCho
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1090, 829);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.listView1);
@@ -512,5 +523,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Timer GameLoop;
+        private System.Windows.Forms.Timer timer1;
     }
 }

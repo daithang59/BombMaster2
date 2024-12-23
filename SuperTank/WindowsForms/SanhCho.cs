@@ -299,5 +299,19 @@ namespace SuperTank.WindowsForms
             }
         }
 
+        private void GameLoop_Tick(object sender, EventArgs e)
+        {
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pnMulti_Paint_1(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
